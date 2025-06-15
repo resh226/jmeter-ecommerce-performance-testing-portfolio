@@ -1,1 +1,53 @@
+name: JMeter Performance Test CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-jmeter-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Apache JMeter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.6.3.zip
+          unzip apache-jmeter-5.6.3.zip
+          echo "JMETER_HOME=$GITHUB_WORKSPACE/apache-jmeter-5.6.3" >> $GITHUB_ENV
+
+      - name: Create Results Directory
+        run: mkdir -p results
+
+      - name: Baseline Load Test (1 user)
+        run: |
+          $JMETER_HOME/bin/jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
+          -Jusers=1 -Jrampup=1 -Jloops=1 \
+          -l results/baseline.jtl -e -o results/html-baseline
+
+      - name: Medium Load Test (10 users)
+        run: |
+          $JMETER_HOME/bin/jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
+          -Jusers=10 -Jrampup=5 -Jloops=1 \
+          -l results/medium.jtl -e -o results/html-medium
+
+      - name: Heavy Load Test (50 users)
+        run: |
+          $JMETER_HOME/bin/jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
+          -Jusers=50 -Jrampup=10 -Jloops=1 \
+          -l results/heavy.jtl -e -o results/html-heavy
+
+      - name: Upload All HTML Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: jmeter-html-reports
+          path: |
+            results/html-baseline
+            results/html-medium
+            results/html-heavy
 
