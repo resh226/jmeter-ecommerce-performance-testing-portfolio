@@ -141,6 +141,7 @@ Implemented via `.github/workflows/jmeter-ci-cd.yml`:
 * Add backend API performance tests
 * Integrate with BlazeMeter
 * Add threshold-based Slack alerting
+* I used 2 login credentials in my CSV, and JMeter reuses them across threads to simulate load. For login performance simulation, uniqueness was not necessary. But I can easily scale it with unique test data if required in future
 
 ---
 
