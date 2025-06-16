@@ -68,7 +68,7 @@ The test plan is modular and simulates real-world e-commerce user behavior with 
 * **Medium Load Test**: 10 users (ramp-up: 5 seconds)
 * **Heavy Load Test**: 50 users (ramp-up: 10 seconds)
 
-Each test uses a `Duration Assertion` to enforce SLA with a 3000 ms threshold a a practice. If any sampler exceeds this threshold, the test is marked as failed. This was key in detecting performance degradation under heavy load.
+Each test uses a `Duration Assertion` to enforce SLA with a 3000 ms threshold as a practice. If any sampler exceeds this threshold, the test is marked as failed. This was key in detecting performance degradation under heavy load.
 
 ---
 
@@ -88,15 +88,17 @@ Captured in [debugging\_journey.pdf](assets/debugging_journey.pdf):
 
 Screenshots of HTML reports of the three level tests are available in `/screenshots`:
 
-| Load     | Pass % | Error Cause            | APDEX Trend                    |
-| -------- | ------ | ---------------------- | ------------------------------ |
-| Baseline | 100%   | None                   | Excellent                      |
-| Medium   | 100%   | None                   | Very Good                      |
-| Heavy    | 99.08% | Response time > 3000ms | APDEX dropped (Login/Products) |
+| Load     | Pass % | Error Rate | Error Cause                        | APDEX Trend                    | Recommendation                                      |
+|----------|--------|------------|------------------------------------|--------------------------------|-----------------------------------------------------|
+| Baseline | 100%   | 0%         | None                               | Excellent                      | ✅ No issues, system is responsive under low load   |
+| Medium   | 100%   | 0%         | None                               | Very Good                      | ✅ Sustains moderate traffic without degradation    |
+| Heavy    | 99.08% | 0.92%      | Response time > 3000ms (SLA fail)  | Dropped in login/product views | ⚠️ Optimize backend performance or enable caching   |
 
-> Note: Error types in heavy test were due to exceeded response time thresholds, not functional failures.
 
+*NOTE:-  Errors in heavy test were due to SLA violations, not functional errors
+  
 ---
+
 
 ## 🚀 CI/CD Integration
 
@@ -117,20 +119,20 @@ Implemented via `.github/workflows/jmeter-ci-cd.yml`:
 
 **Option 1: Run via BAT File (Windows)**
 
-  *Double click or run this in CMD:
-  *run-all-tests.bat
-This will run all 3 tests (baseline, medium, heavy) and generate HTML reports in respective folders.
+ * Double click or run this in CMD:
+ * run-all-tests.bat
+ * This will run all 3 tests (baseline, medium, heavy) and generate HTML reports in respective folders.
 
 **Option 2: Run via Command Line (Windows)**
 
-*Baseline Test
-jmeter -n -t test-plans/Ecommerce_TestPlan.jmx -Jusers=1 -Jrampup=1 -Jloops=1 -l results/baseline.jtl -e -o results/html-baseline
+* **Baseline Test**
+* jmeter -n -t test-plans/Ecommerce_TestPlan.jmx -Jusers=1 -Jrampup=1 -Jloops=1 -l results/baseline.jtl -e -o results/html-baseline
 
-*Medium Test
-jmeter -n -t test-plans/Ecommerce_TestPlan.jmx -Jusers=10 -Jrampup=5 -Jloops=1 -l results/medium.jtl -e -o results/html-medium
+* **Medium Test**
+* jmeter -n -t test-plans/Ecommerce_TestPlan.jmx -Jusers=10 -Jrampup=5 -Jloops=1 -l results/medium.jtl -e -o results/html-medium
 
-*Heavy Test
-jmeter -n -t test-plans/Ecommerce_TestPlan.jmx -Jusers=50 -Jrampup=10 -Jloops=1 -l results/heavy.jtl -e -o results/html-heavy
+* **Heavy Test**
+* jmeter -n -t test-plans/Ecommerce_TestPlan.jmx -Jusers=50 -Jrampup=10 -Jloops=1 -l results/heavy.jtl -e -o results/html-heavy
 
 ---
 
