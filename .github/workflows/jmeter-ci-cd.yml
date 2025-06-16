@@ -2,65 +2,61 @@ name: JMeter Performance Test CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   run-jmeter-tests:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-      - name: Install Apache JMeter
-        run: |
-          wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
-          tar -xvzf apache-jmeter-5.6.3.tgz
-          export JMETER_HOME=$(pwd)/apache-jmeter-5.6.3
-          echo "$JMETER_HOME/bin" >> $GITHUB_PATH
+    - name: Install Apache JMeter
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jmeter
 
-      - name: Prepare Results Folder
-        run: |
-          rm -rf results
-          mkdir -p results
+    - name: Create Results Directory
+      run: mkdir -p results
 
-      - name: Baseline Load Test (1 user)
-        run: |
-          jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
-            -Jusers=1 -Jrampup=1 -Jloops=1 \
-            -l results/baseline.jtl
-          if [ -s results/baseline.jtl ]; then
-            jmeter -g results/baseline.jtl -o results/html-baseline
-          else
-            echo "No results generated for baseline test." && exit 1
-          fi
+    # === Baseline Load Test ===
+    - name: Baseline Load Test (1 user)
+      run: |
+        rm -rf results/html-baseline
+        mkdir -p results/html-baseline
+        jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
+          -Jusers=1 -Jrampup=1 -Jloops=1 \
+          -l results/baseline.jtl \
+          -e -o results/html-baseline
 
-      - name: Medium Load Test (10 users)
-        run: |
-          jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
-            -Jusers=10 -Jrampup=5 -Jloops=1 \
-            -l results/medium.jtl
-          if [ -s results/medium.jtl ]; then
-            jmeter -g results/medium.jtl -o results/html-medium
-          else
-            echo "No results generated for medium test." && exit 1
-          fi
+    # === Medium Load Test ===
+    - name: Medium Load Test (10 users)
+      run: |
+        rm -rf results/html-medium
+        mkdir -p results/html-medium
+        jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
+          -Jusers=10 -Jrampup=5 -Jloops=1 \
+          -l results/medium.jtl \
+          -e -o results/html-medium
 
-      - name: Heavy Load Test (50 users)
-        run: |
-          jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
-            -Jusers=50 -Jrampup=10 -Jloops=1 \
-            -l results/heavy.jtl
-          if [ -s results/heavy.jtl ]; then
-            jmeter -g results/heavy.jtl -o results/html-heavy
-          else
-            echo "No results generated for heavy test." && exit 1
-          fi
+    # === Heavy Load Test ===
+    - name: Heavy Load Test (50 users)
+      run: |
+        rm -rf results/html-heavy
+        mkdir -p results/html-heavy
+        jmeter -n -t test-plans/Ecommerce_TestPlan.jmx \
+          -Jusers=50 -Jrampup=10 -Jloops=1 \
+          -l results/heavy.jtl \
+          -e -o results/html-heavy
 
-      - name: Upload All HTML Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: jmeter-html-reports
-          path: |
-            results/html-baseline
-            results/html-medium
-            results/html-heavy
+    # === Upload Reports as Artifacts ===
+    - name: Upload All HTML Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: jmeter-html-reports
+        path: |
+          results/html-baseline
+          results/html-medium
+          results/html-heavy
