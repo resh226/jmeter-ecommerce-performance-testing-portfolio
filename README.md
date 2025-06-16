@@ -1,6 +1,6 @@
 # JMeter E-commerce Performance Testing Portfolio
 
-Welcome to my **JMeter Performance Testing Portfolio**, a hands-on showcase of my performance engineering skills using JMeter targeting the [Automation Exercise](https://automationexercise.com/) website. This project covers:
+Welcome to my **JMeter Performance Testing Portfolio**, a hands-on showcase of my performance testing skills using JMeter targeting the [Automation Exercise](https://automationexercise.com/) website. This project covers:
 
 * **✅ Functional Flow Validation (Simulated real-user interactions)**
 * **📈 Performance Testing (Baseline, Medium & Heavy load scenarios)**
