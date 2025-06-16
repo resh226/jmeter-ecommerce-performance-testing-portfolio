@@ -113,9 +113,9 @@ Implemented via `.github/workflows/jmeter-ci-cd.yml`:
 
 🛠️ Prerequisites
 
-  *Apache JMeter must be installed locally
-  *JMeter bin path should be added to system environment variables (PATH)
-  *clone the github repository to local
+  * Apache JMeter must be installed locally
+  * JMeter bin path should be added to system environment variables (PATH)
+  * clone the github repository to local
 
 **Option 1: Run via BAT File (Windows)**
 
